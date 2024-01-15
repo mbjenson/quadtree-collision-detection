@@ -4,7 +4,6 @@
 
 ### Contents
 1. [**Build**](#build)
-2. [**Run**](#run)
 3. [**Scene Settup**](#scene-settup)
 4. [**Logic**](#logic)
 
@@ -25,7 +24,6 @@ finally, compile
 
     make
 
-### Run
 Run executable
 
     ./bin/QuadtreeDemo
