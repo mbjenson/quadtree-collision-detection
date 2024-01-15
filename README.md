@@ -34,7 +34,7 @@ When running the exectuable, you will be prompted for the following information 
 * `object count`: number of physics objects in the scene
 * `object size range 'min max'`: range for randomly generated physics objects
 * `velocity range 'min max'`: initial object velocity range
-* `collision detection` type: choose whether to use the quadtree or to use bruteforce to calculate the object collisions
+* `collision detection type`: choose whether to use the quadtree or to use bruteforce to calculate the object collisions
 
 *I recommend finding a scenerio that works and comparing it with, to without quadtree to see the performance difference.*
 
