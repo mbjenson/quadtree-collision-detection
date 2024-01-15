@@ -1,11 +1,12 @@
 ## Quadtree-Accelerated Collision Detection
 
-Visualizes of how collision detection in 2D can be optimized using a quadtree
+#### Visualizes of how collision detection in 2D can be optimized using a quadtree.
 
 ### Contents
 1. [**Build**](#build)
 2. [**Run**](#run)
 3. [**Scene Settup**](#scene-settup)
+4. [**Logic**](#logic)
 
 ### Build
 *note: uses `g++` and `cmake`*
@@ -36,11 +37,22 @@ When running the exectuable, you will be prompted for the following information 
 * `velocity range 'min max'`: initial object velocity range
 * `collision detection type`: choose whether to use the quadtree or to use bruteforce to calculate the object collisions
 
-*I recommend finding a scenerio that works and comparing it with, to without quadtree to see the performance difference.*
-
 #### recommended scenerios:
-1) 10000 objects, object size 2 4, object velocity 20 90, use quadtree (1)
-2) 500 objects, object size 20 40, object velocity 30 90, use quadtree (1)
+I *highly recommend* trying out the following scenerios first
+1) object count = 10, object size range = 100 140, object velocity range = 10 200, use quadtree acceleration (1)
+2) object count = 100, object size range = 40 60, object velocity range = 20 200, use quadtree acceleration (1)
+3) object count = 3000, object size range = 4 8, object velocity range = 20 60, use quadtree acceleration (1)
+   *compare this test's performance with the brute force method*
+5) object count = 15000, object size range 2 4, object veloctiy range = 10 100, use quadtree acceleration (1)
+   *compare this test's performance with the brute force method*
+
+### Logic
+This implementation stands out because:
+* it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. The collisions are then evaluated recursively with all children of a node, should it contains value(s) and have children.
+* bounding boxes for the values it stores are computed on the fly. This may seem computationally heavy, however, its performance impact turns out to be quite small and it is useful to have a more lightweight structure like this.
+
+
+
 
 
 
