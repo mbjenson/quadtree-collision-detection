@@ -7,7 +7,6 @@ Visualizes of how collision detection in 2D can be optimized using a quadtree
 2. [**Run**](#run)
 3. [**Scene Settup**](#scene-settup)
 4. [**Controls**](#controls)
-5. 
 
 ### Build
 *note: uses `g++` and `cmake`*
