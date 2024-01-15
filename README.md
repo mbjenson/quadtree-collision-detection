@@ -4,8 +4,9 @@
 
 ### Contents
 1. [**Build**](#build)
-3. [**Scene Settup**](#scene-settup)
-4. [**Logic**](#logic)
+2. [**Scene Settup**](#scene-settup)
+3. [**Logic**](#logic)
+4. [**Rendering**](#rendering)
 
 ### Build
 *note: uses `g++` and `cmake`*
@@ -49,19 +50,7 @@ This quadtree implementation stands out because:
 * it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. The collisions are then evaluated recursively with all children of a node, should it contains value(s) and have children.
 * bounding boxes for the values it stores are computed on the fly. This may seem computationally heavy, however, its performance impact turns out to be quite small and it is useful to have a more lightweight structure like this.
 
+### Rendering
+Rendering is done with the [SFML](https://github.com/SFML/SFML) graphics API.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+This program spends very little time drawing which is owed to the single vertex draw call. This was accomplished by using a bunch of functions that take rectangles and translate the information into verticies which are then placed into a vertex array which is sent to the GPU.
