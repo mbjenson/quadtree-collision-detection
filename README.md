@@ -23,7 +23,7 @@ Clone repository
 
 
     git clone https://github.com/mbjenson/quadtree-collision-detection.git
-Navigate to project root with `CMakeLists.txt` and create build directory
+Navigate to the project root directory containing `CMakeLists.txt` and create build directory
 
     mkdir build
     cd build
