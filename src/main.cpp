@@ -227,14 +227,16 @@ int main() {
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                    Vec2f newObjSize(getRandInRange(objSizeMin, objSizeMax), getRandInRange(objSizeMin, objSizeMax));
-                    physics::Object newObj(
-                        Vec2f(sfMouseWorldPos.x - (newObjSize.x / 2), sfMouseWorldPos.y - (newObjSize.y / 2)), 
-                        newObjSize, newObjSize.x * newObjSize.y);
-                    newObj.velocity = Vec2f(getRandVelocity(objInitVelMin, objInitVelMax), 
-                                            getRandVelocity(objInitVelMin, objInitVelMax));
-                    newObj.color = colors[rand() % colors.size()];
-                    physObjs.push_back(newObj);
+                    if (world.contains(sfMouseWorldPos) {
+                        Vec2f newObjSize(getRandInRange(objSizeMin, objSizeMax), getRandInRange(objSizeMin, objSizeMax));
+                        physics::Object newObj(
+                            Vec2f(sfMouseWorldPos.x - (newObjSize.x / 2), sfMouseWorldPos.y - (newObjSize.y / 2)), 
+                            newObjSize, newObjSize.x * newObjSize.y);
+                        newObj.velocity = Vec2f(getRandVelocity(objInitVelMin, objInitVelMax), 
+                                                getRandVelocity(objInitVelMin, objInitVelMax));
+                        newObj.color = colors[rand() % colors.size()];
+                        physObjs.push_back(newObj);
+                    }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) { // reset view
                     zoom = defaultZoom;
