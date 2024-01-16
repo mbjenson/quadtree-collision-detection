@@ -1,6 +1,6 @@
 ## Quadtree-Accelerated Collision Detection
 
-#### Visualizes of how collision detection in 2D can be optimized using a quadtree data structure.
+#### Visualizes how collision detection in 2D can be optimized using a quadtree data structure.
 
 ### Contents
 1. [**Build**](#build)
