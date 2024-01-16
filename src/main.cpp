@@ -5,6 +5,7 @@
 #include <random>
 #include <limits>
 #include <filesystem>
+#include <unordered_map>
 #include "VertUtil.hpp"
 #include "ProjectPath.hpp"
 #include "RandomUtil.hpp"
