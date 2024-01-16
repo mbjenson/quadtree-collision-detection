@@ -228,7 +228,7 @@ int main() {
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-                    if (world.contains(sfMouseWorldPos) {
+                    if (world.contains(sfMouseWorldPos)) {
                         Vec2f newObjSize(getRandInRange(objSizeMin, objSizeMax), getRandInRange(objSizeMin, objSizeMax));
                         physics::Object newObj(
                             Vec2f(sfMouseWorldPos.x - (newObjSize.x / 2), sfMouseWorldPos.y - (newObjSize.y / 2)), 
