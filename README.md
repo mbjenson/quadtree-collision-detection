@@ -66,7 +66,7 @@ This program spends very little time drawing which is owed to the single vertex 
 
 ## User-Interface and Controls
 #### info
-The frames-per-second, scene object count, and realtime object collision count are displayed on the top left of the screen
+* The frames-per-second, scene object count, and realtime object collision count are displayed on the top left of the screen
 #### controlling the scene
 * place object at cursor position : Space
 * toggle quadtree visibility : N
