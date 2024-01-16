@@ -2,13 +2,12 @@
 
 #### Visualizes of how collision detection in 2D can be optimized using a quadtree data structure.
 
-*benchmarked @ 100 fps for 10000 physics objects on an AMD ryzen 9 7900hs and Nvidia RTX 3070 laptop card*
-
 ### Contents
 1. [**Build**](#build)
 2. [**Scene Settup**](#scene-settup)
-3. [**Logic**](#logic)
-4. [**Rendering**](#rendering)
+3. [**Stats**](#stats)
+4. [**Logic**](#logic)
+5. [**Rendering**](#rendering)
 
 ### Build
 *note: uses `g++` and `cmake`*
@@ -46,6 +45,9 @@ I *highly recommend* trying out the following scenerios first
    *compare this test's performance with the brute force method*
 5) object count = 15000, object size range 2 4, object veloctiy range = 10 100, use quadtree acceleration (1)
    *compare this test's performance with the brute force method*
+
+### Stats
+*benchmarked @ 100 fps for 10000 physics objects on an AMD ryzen 9 7900hs and Nvidia RTX 3070 laptop card*
 
 ### Logic
 This quadtree implementation stands out because:
