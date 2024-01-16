@@ -47,7 +47,7 @@ I *highly recommend* trying out the following scenerios first
    *compare this test's performance with the brute force method*
 
 ### Stats
-*benchmarked @ 100 fps for 10000 physics objects on an AMD ryzen 9 7900hs and Nvidia RTX 3070 laptop card*
+*benchmarked @ 100 fps for 10000 physics objects on an AMD ryzen 9 5900hs and Nvidia RTX 3070 laptop gpu*
 
 ### Logic
 This quadtree implementation stands out because:
