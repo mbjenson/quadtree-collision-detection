@@ -52,7 +52,7 @@ I *highly recommend* trying out the following scenerios first
 ### Logic
 This quadtree implementation stands out because:
 * it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. The collisions are then evaluated recursively with all children of a node, should it contains value(s) and have children.
-* bounding boxes for the values it stores are computed on the fly. This may seem computationally heavy, however, its performance impact turns out to be quite small and it is useful to have a more lightweight structure like this.
+* bounding boxes are computed on the fly. This may seem computationally heavy, however, its performance impact turned out to be quite small and it is extremely useful to have a structure like this be more lightweight.
 
 ### Rendering
 Rendering is done with the [SFML](https://github.com/SFML/SFML) graphics API.
