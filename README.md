@@ -56,7 +56,7 @@ I *highly recommend* trying out the following scenerios first
 
 ## Logic
 This quadtree implementation stands out because:
-* it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. For values stored in interior nodes, the collisions are evaluated recursively with all children of its containing node.
+* it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. For values stored in interior nodes, the collisions are evaluated recursively with all values stored in the children of its containing node.
 * bounding boxes are computed on the fly. This may seem computationally heavy, however, its performance impact turned out to be quite small and it is extremely useful to have a structure like this be more lightweight.
 
 ## Rendering
