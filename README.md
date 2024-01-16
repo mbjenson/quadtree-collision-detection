@@ -2,6 +2,8 @@
 
 #### Visualizes of how collision detection in 2D can be optimized using a quadtree data structure.
 
+*benchmarked with 20,000 physics objects @ 50 fps on an AMD ryzen 9 7900hs and Nvidia RTX 3070*
+
 ### Contents
 1. [**Build**](#build)
 2. [**Scene Settup**](#scene-settup)
