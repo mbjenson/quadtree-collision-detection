@@ -30,7 +30,7 @@ Navigate to the project root directory containing `CMakeLists.txt` and create bu
 generate project build files
 
     cmake ..
-finally, compile
+compile executable
 
     make
 
