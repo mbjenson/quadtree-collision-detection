@@ -7,7 +7,7 @@
 #include <filesystem>
 #include "VertUtil.hpp"
 #include "ProjectPath.hpp"
-#include "randomUtil.hpp"
+#include "RandomUtil.hpp"
 #include "Physics.hpp"
 #include "Quadtree.hpp"
 
