@@ -10,13 +10,6 @@
 #include "Rect.hpp"
 
 
-/*
-Helpful Quadtree-related resources:
-
-    [https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det]
-    [https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html]
-*/
-
 /**
  * @brief quad tree data structure class.
  *          Computes bounding boxes on the fly to save space.
