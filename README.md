@@ -29,7 +29,7 @@ Navigate to the project root directory containing `CMakeLists.txt` and create bu
     cd build
     cmake ..
     
-compile executable with `make`.
+compile executable with `make`\
 compiled binary will be located in `/bin/QuadtreeDemo`
 
 ## Scene Settup
