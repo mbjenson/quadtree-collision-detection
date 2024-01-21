@@ -34,9 +34,8 @@ compile executable
 
     make
 
-Run executable
+compiled binary is located in `/bin/QuadtreeDemo`
 
-    ./bin/QuadtreeDemo
 ## Scene Settup
 
 When running the exectuable, you will be prompted for the following information in the command line
