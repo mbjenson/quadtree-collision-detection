@@ -27,14 +27,10 @@ Navigate to the project root directory containing `CMakeLists.txt` and create bu
 
     mkdir build
     cd build
-generate project build files
-
     cmake ..
-compile executable
-
-    make
-
-compiled binary is located in `/bin/QuadtreeDemo`
+    
+compile executable with `make`.
+compiled binary will be located in `/bin/QuadtreeDemo`
 
 ## Scene Settup
 
