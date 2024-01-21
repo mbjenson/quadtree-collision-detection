@@ -17,7 +17,9 @@ Visualization of how a quadtree can be used to massively increase the performanc
 *program in action with 4000 objects*
 
 ## Build
-*note: uses `g++` and `cmake`*
+
+* *uses `g++` and `cmake`*
+* *SFML has some x11 and OpenGL dependencies*
 
 Clone repository
 
