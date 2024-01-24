@@ -19,7 +19,7 @@ Visualization of how a quadtree can be used to massively increase the performanc
 ## Build
 
 * *uses `g++` and `cmake`*
-* *SFML has some x11 and OpenGL dependencies*
+* *dependencies: SFML*
 
 Clone repository
 
