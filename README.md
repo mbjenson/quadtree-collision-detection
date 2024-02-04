@@ -18,8 +18,12 @@ Visualization of how a quadtree can be used to massively increase the performanc
 
 ## Build
 
-* *uses `g++` and `cmake`*
-* *dependencies: SFML*
+#### dependencies
+*uses `g++` & `cmake`*\
+*graphics API: `SFML`*
+  
+    sudo apt-get install libsfml-dev
+
 
 Clone repository
 
