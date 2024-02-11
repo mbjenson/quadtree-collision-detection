@@ -21,7 +21,7 @@ Visualization of how a quadtree can be used to massively increase the performanc
 Dependencies
 * `g++`
 * `cmake`
-* `SFML`: download from the [SFML website](https://www.sfml-dev.org/download.php) or use your package manager to install `libsfml-dev`
+* `SFML`: download from the [SFML website](https://www.sfml-dev.org/download.php)
 
 Clone repository
 
