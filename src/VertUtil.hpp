@@ -1,3 +1,6 @@
+#ifndef VERT_CONV_UTIL_H
+#define VERT_CONV_UTIL_H
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Physics.hpp"
@@ -6,8 +9,7 @@
 Different functions for computing verticies from other types
 */
 
-#ifndef VERT_CONV_UTIL_H
-#define VERT_CONV_UTIL_H
+
 
 // Uses provided color
 inline void computeBoxFrameVerts(   const physics::Object& obj, std::vector<sf::Vertex>& verts, 

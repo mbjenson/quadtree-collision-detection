@@ -7,7 +7,6 @@
 #include <filesystem>
 #include <unordered_map>
 #include "VertUtil.hpp"
-#include "ProjectPath.hpp"
 #include "RandomUtil.hpp"
 #include "Physics.hpp"
 #include "Quadtree.hpp"
@@ -85,7 +84,7 @@ int main() {
     if (std::cin.get() == '\n') {
         std::cout << "Generating Scene...\n";
     }
-
+    
     auto window = sf::RenderWindow{ {windowDim.x, windowDim.y}, "Quadtree Demonstration", 
                                     sf::Style::Titlebar | sf::Style::Close};
 
@@ -95,10 +94,14 @@ int main() {
         sf::Color(51, 255, 51), sf::Color(51, 255, 153), sf::Color(51, 255, 255), sf::Color(51, 153, 255),
         sf::Color(51, 51, 255), sf::Color(153, 51, 255), sf::Color(255, 51, 255), sf::Color(255, 51, 153)};
     
-    //sf::View cam(sf::FloatRect(0, 0, 1100, 1200));
     sf::View cam(sf::FloatRect(0, 0, static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)));
 
     window.setView(cam);
+
+    sf::RenderTexture textCanvas;
+    if (!textCanvas.create(windowDim.x, windowDim.y / 9)) {
+        return EXIT_FAILURE;
+    }
 
     const float maxZoom = 3.0f;
     const float minZoom = 0.05f;
@@ -119,6 +122,7 @@ int main() {
     physics::PhysicsHandler pHandler;
     std::vector<physics::Object> physObjs;
     
+    // load objects
     physObjs.reserve(sceneNumObjects);
     for (int i = 0; i < sceneNumObjects; i++) {
         physics::Object thisObj(
@@ -135,9 +139,12 @@ int main() {
     std::vector<Rect<float>> nodeRects;
     std::unordered_map<physics::Object*, physics::Object*> objColMap;
     std::vector<sf::Vertex> verticies;
-        
     sf::Font roboto;
-    roboto.loadFromFile(getProjectPath() + "res/Roboto/Roboto-Regular.ttf");
+    
+    if (!roboto.loadFromFile("res/Roboto/Roboto-Regular.ttf")) {
+        return EXIT_FAILURE;
+    }
+    
     std::string winTextString;
     sf::Text winText;
     winText.setFont(roboto);
@@ -266,54 +273,66 @@ int main() {
             cam.move(0, moveAmount * dt);
         }
 
+        
+        // DRAW VERTICIES
         window.clear();
         window.setView(cam);
-        // DRAW VERTICIES
         window.draw(&verticies[0], verticies.size(), sf::Quads);
+        
         verticies.clear(); // clear vector
+
         // DRAW TEXT
+        textCanvas.clear(sf::Color(255, 255, 255, 0));
         winText.setFillColor(sf::Color(255, 255, 255));
         char c[10];
         sprintf(c, "%.f", fps);
         winTextString = "FPS: " + std::string(c);
         winText.setString(winTextString);
         winText.setPosition(5.f, 2.f);
-        window.draw(winText);
+        textCanvas.draw(winText);
 
         winTextString = "Obj Count: " + std::to_string(curNumObjects);
         winText.setPosition(5.f, 32.f);
         winText.setString(winTextString);
-        window.draw(winText);
+        textCanvas.draw(winText);
 
         winTextString = "Collision Count: " + std::to_string(curNumCollisions);
         winText.setPosition(5.f, 63.f);
         winText.setString(winTextString);
-        window.draw(winText);
+        textCanvas.draw(winText);
 
         if (useQuadtree) {
             winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]    show quadtree: [N]\nzoom: [ctrl +-]";
             winText.setString(winTextString);
             winText.setPosition(300.f, 2.f);
-            window.draw(winText);
+            textCanvas.draw(winText);
 
             winTextString = "quadtree accelerated\ncollision detection";
             winText.setString(winTextString);
             winText.setFillColor(sf::Color(80, 230, 80));
             winText.setPosition(static_cast<float>(windowDim.x) - 250.f, 2.f);
-            window.draw(winText);
+            textCanvas.draw(winText);
         }
         else {
             winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]\nzoom: [ctrl +-]";
             winText.setString(winTextString);
             winText.setPosition(300.f, 2.f);
-            window.draw(winText);
+            textCanvas.draw(winText);
 
             winTextString = "brute force\ncollision detection";
             winText.setString(winTextString);
             winText.setFillColor(sf::Color(240, 140, 80));
             winText.setPosition(static_cast<float>(windowDim.x) - 250.f, 2.f);
-            window.draw(winText);
+            textCanvas.draw(winText);
         }
+
+        textCanvas.display();
+        sf::Sprite uiSprite(textCanvas.getTexture());
+        uiSprite.setPosition(cam.getCenter().x - cam.getSize().x / 2, cam.getCenter().y - cam.getSize().y / 2);
+        uiSprite.setScale(zoom, zoom);
+        
+        window.draw(uiSprite);
+
         window.display();
     }
 }

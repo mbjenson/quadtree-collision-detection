@@ -1,7 +1,8 @@
-#include <random>
 
 #ifndef RAND_UTIL_H
 #define RAND_UTIL_H
+
+#include <random>
 
 inline float getRandVelocity(int absDeadZone, int absRange) {
     float val = 0.f;
