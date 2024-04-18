@@ -12,8 +12,12 @@ Visualization of how a quadtree can be used to massively increase the performanc
 
 ## Preview
 *program in action with 4000 objects*
+
 <img width="400" alt="program in action with 4000 objects" src="https://github.com/mbjenson/quadtree-collision-detection/assets/115751313/ebb3d9d5-67d7-4fe9-a46c-0dfc82591ada">
-*program running with various quantity objects*
+
+
+*Demo Video*
+
 https://github.com/mbjenson/quadtree-collision-detection/assets/115751313/adc2295e-a4e4-4d9d-a1cc-2c6d736d7d40
 
 ## Build
