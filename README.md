@@ -33,7 +33,7 @@ Navigate to the project root directory containing `Makefile` and use command
 
     make
     
-To run use
+then run using
 
     make run
 
