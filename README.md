@@ -20,21 +20,22 @@ Visualization of how a quadtree can be used to massively increase the performanc
 
 Dependencies
 * `g++`
-* `cmake`
-* `SFML`: download from the [SFML website](https://www.sfml-dev.org/download.php)
+* `SFML`:
+    install with apt-get
+
+      sudo apt-get install libsfml-dev
+    or download from the [SFML website](https://www.sfml-dev.org/download.php)
 
 Clone repository
 
-
     git clone https://github.com/mbjenson/quadtree-collision-detection.git
-Navigate to the project root directory containing `CMakeLists.txt` and create build directory
+Navigate to the project root directory containing `Makefile` and use command
 
-    mkdir build
-    cd build
-    cmake ..
+    make
     
-compile executable with `make`\
-compiled binary will be located at `/bin/QuadtreeDemo`
+To run use
+
+    make run
 
 ## Scene Settup
 
@@ -45,7 +46,7 @@ When running the exectuable, you will be prompted for the following information 
 * `collision detection type`: choose whether to use the quadtree or to use bruteforce to calculate the object collisions
 
 #### recommended scenerios:
-I *highly recommend* trying out the following scenerios first
+I highly recommend trying out the following scenerios first
 1) object count = 10, object size range = 100 140, object velocity range = 10 200, use quadtree acceleration (1)
 2) object count = 100, object size range = 40 60, object velocity range = 20 200, use quadtree acceleration (1)
 3) object count = 3000, object size range = 4 8, object velocity range = 20 60, use quadtree acceleration (1)\
@@ -55,8 +56,8 @@ I *highly recommend* trying out the following scenerios first
 
 ## Logic
 This quadtree implementation stands out because:
-* it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing values in both leaf and interior nodes. For values stored in interior nodes, the collisions are evaluated recursively with all values stored in the children of its containing node.
-* bounding boxes are computed on the fly. This may seem computationally heavy, however, its performance impact turned out to be quite small and it is extremely useful to have a structure like this be more lightweight.
+* it can store objects that have massive bounding boxes and tiny bounding boxes. It does this by storing objects in either the leaf or interior nodes of the tree, depending on the object size. For values stored in interior nodes, the collisions are evaluated recursively with all values stored in the children of its containing node.
+* bounding boxes are computed on the fly. This may seem computationally heavy, however, its performance impact turned out to be negligible and it allows the implementation to be very lightweight.
 
 ## Rendering
 Rendering is done with the [SFML](https://github.com/SFML/SFML) graphics API.
