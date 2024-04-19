@@ -165,40 +165,7 @@ int main() {
         float fps = 1.f/(dt);
         numFrames++;
         fpsSum += fps;
-        
-        for (auto &obj : physObjs) {
-            obj.update(dt); // update physics objects
-        }
 
-        for (auto &obj : physObjs) {
-            worldBounds.checkCollision(obj); // resolve collisions with world boundary
-        }
-        
-        if (useQuadtree) {
-            for (int i = 0; i < physObjs.size(); i++) {
-                qt.add(&physObjs[i]);
-            }
-            objColMap = qt.findAllIntersections();
-            curNumCollisions = objColMap.size();
-            curNumObjects = qt.getNumObjects();
-
-            pHandler.resolveColsFromMap(objColMap);
-
-            if (showNodes) {
-                qt.getNodeRects(nodeRects);
-                computeBoxFrameVertsFromVec(nodeRects, verticies, sf::Color(255, 255, 255, 120), 0.8f);
-                nodeRects.clear();
-            }
-            qt.clearAll();
-        }
-        else {
-            pHandler.BRUTE_resolveCols(physObjs);
-        }
-        computePhysicsObjectVertsFromVec(physObjs, verticies);
-
-        computeBoxFrameVerts(worldBounds.boundingBox, verticies, sf::Color::Yellow, 1.f);
-        objColMap.clear();
-        
         // mouse position
         sf::Vector2i sfMousePos = sf::Mouse::getPosition(window);
         sf::Vector2f sfMouseWorldPos = window.mapPixelToCoords(sfMousePos);
@@ -208,7 +175,7 @@ int main() {
         float mag = centerToMouse.getMag();
         centerToMouse.normalize();
         centerToMouse = centerToMouse * mag * 0.25;
-        
+
         sf::Event event;
         while (window.pollEvent(event)) { // barebones event handling
             if (event.type == sf::Event::Closed || 
@@ -272,6 +239,43 @@ int main() {
             sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             cam.move(0, moveAmount * dt);
         }
+        
+        for (auto &obj : physObjs) {
+            obj.update(dt); // update physics objects
+        }
+
+        for (auto &obj : physObjs) {
+            worldBounds.checkCollision(obj); // resolve collisions with world boundary
+        }
+        
+        if (useQuadtree) {
+            for (int i = 0; i < physObjs.size(); i++) {
+                qt.add(&physObjs[i]);
+            }
+            objColMap = qt.findAllIntersections();
+            curNumCollisions = objColMap.size();
+            curNumObjects = qt.getNumObjects();
+
+            pHandler.resolveColsFromMap(objColMap);
+
+            if (showNodes) {
+                qt.getNodeRects(nodeRects);
+                computeBoxFrameVertsFromVec(nodeRects, verticies, sf::Color(255, 255, 255, 120), 0.8f);
+                nodeRects.clear();
+            }
+            qt.clearAll();
+        }
+        else {
+            pHandler.BRUTE_resolveCols(physObjs);
+        }
+        computePhysicsObjectVertsFromVec(physObjs, verticies);
+
+        computeBoxFrameVerts(worldBounds.boundingBox, verticies, sf::Color::Yellow, 1.f);
+        objColMap.clear();
+        
+        
+        
+        
 
         
         // DRAW VERTICIES
