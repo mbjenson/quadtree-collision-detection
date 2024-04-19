@@ -106,9 +106,10 @@ int main() {
     const float maxZoom = 3.0f;
     const float minZoom = 0.05f;
     const float defaultZoom = 1.f;
-    const float zoomAmount = 0.07f;
+    const float zoomAmount = 1.8f;//const float zoomAmount = 0.07f;
     float zoom = 1.f;
     float moveAmount = 200.f;
+    
 
     sf::Clock clock;
     float dt;
@@ -187,14 +188,14 @@ int main() {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || 
                     sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
                     if (event.key.code == sf::Keyboard::Equal) {
-                        zoom -= zoomAmount;
+                        zoom -= zoomAmount * dt;
                         if (zoom < minZoom)
                             zoom = minZoom;
                         cam.setSize(windowDim.x * zoom, windowDim.y * zoom);
                         cam.move(centerToMouse.x, centerToMouse.y);
                     }
                     if (event.key.code == sf::Keyboard::Hyphen) {
-                        zoom += zoomAmount;
+                        zoom += zoomAmount * dt;
                         if (zoom > maxZoom)
                             zoom = maxZoom;
                         cam.setSize(windowDim.x * zoom, windowDim.y * zoom);
