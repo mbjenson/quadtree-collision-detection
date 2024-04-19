@@ -208,10 +208,12 @@ int main() {
                         physics::Object newObj(
                             Vec2f(sfMouseWorldPos.x - (newObjSize.x / 2), sfMouseWorldPos.y - (newObjSize.y / 2)), 
                             newObjSize, newObjSize.x * newObjSize.y);
+                        
                         newObj.velocity = Vec2f(getRandVelocity(objInitVelMin, objInitVelMax), 
                                                 getRandVelocity(objInitVelMin, objInitVelMax));
                         newObj.color = colors[rand() % colors.size()];
                         physObjs.push_back(newObj);
+                        
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) { // reset view
@@ -245,12 +247,13 @@ int main() {
             obj.update(dt); // update physics objects
         }
 
-        for (auto &obj : physObjs) {
-            worldBounds.checkCollision(obj); // resolve collisions with world boundary
-        }
+        // for (auto &obj : physObjs) {
+        //     worldBounds.checkCollision(obj); // resolve collisions with world boundary
+        // }
         
         if (useQuadtree) {
             for (int i = 0; i < physObjs.size(); i++) {
+                worldBounds.checkCollision(physObjs[i]);
                 qt.add(&physObjs[i]);
             }
             objColMap = qt.findAllIntersections();
@@ -273,11 +276,6 @@ int main() {
 
         computeBoxFrameVerts(worldBounds.boundingBox, verticies, sf::Color::Yellow, 1.f);
         objColMap.clear();
-        
-        
-        
-        
-
         
         // DRAW VERTICIES
         window.clear();
