@@ -30,7 +30,7 @@ Dependencies
       sudo apt-get install libsfml-dev
     or download from the [SFML website](https://www.sfml-dev.org/download.php)
 
-Clone repository
+Clone this repository (or download the .zip)
 
     git clone https://github.com/mbjenson/quadtree-collision-detection.git
 Navigate to the project root directory containing `Makefile` and use command
