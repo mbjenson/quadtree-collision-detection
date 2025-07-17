@@ -85,7 +85,7 @@ int main() {
         std::cout << "Generating Scene...\n";
     }
     
-    auto window = sf::RenderWindow{ {windowDim.x, windowDim.y}, "Quadtree Demonstration", 
+    auto window = sf::RenderWindow{sf::VideoMode(windowDim), "Quadtree Demonstration", 
                                     sf::Style::Titlebar | sf::Style::Close};
 
     // color pallete
@@ -94,15 +94,23 @@ int main() {
         sf::Color(51, 255, 51), sf::Color(51, 255, 153), sf::Color(51, 255, 255), sf::Color(51, 153, 255),
         sf::Color(51, 51, 255), sf::Color(153, 51, 255), sf::Color(255, 51, 255), sf::Color(255, 51, 153)};
     
-    sf::View cam(sf::FloatRect(0, 0, static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)));
+    sf::View cam(
+        sf::FloatRect(
+            {0, 0}, 
+            {static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)}
+        ));
 
     window.setView(cam);
 
     sf::RenderTexture textCanvas;
-    if (!textCanvas.create(windowDim.x, windowDim.y / 9)) {
+    try {
+        textCanvas = sf::RenderTexture({windowDim.x, windowDim.y / 9});
+    }
+    catch (sf::Exception ex) {
+        printf(ex.what());
         return EXIT_FAILURE;
     }
-
+    
     const float maxZoom = 3.0f;
     const float minZoom = 0.05f;
     const float defaultZoom = 1.f;
@@ -140,18 +148,17 @@ int main() {
     std::vector<Rect<float>> nodeRects;
     std::unordered_map<physics::Object*, physics::Object*> objColMap;
     std::vector<sf::Vertex> verticies;
+
     sf::Font roboto;
-    
-    if (!roboto.loadFromFile("res/Roboto/Roboto-Regular.ttf")) {
+    if (!roboto.openFromFile("res/Roboto/Roboto-Regular.ttf")) {
         return EXIT_FAILURE;
     }
     
     std::string winTextString;
-    sf::Text winText;
-    winText.setFont(roboto);
+    sf::Text winText(roboto);
     winText.setCharacterSize(25);
     winText.setFillColor(sf::Color::White);
-    winText.setPosition(0.f, 0.f);
+    winText.setPosition({0, 0});
 
     int curNumNodes = 1;
     int curNumCollisions = 0;
@@ -177,32 +184,36 @@ int main() {
         centerToMouse.normalize();
         centerToMouse = centerToMouse * mag * 0.25;
 
-        sf::Event event;
-        while (window.pollEvent(event)) { // barebones event handling
-            if (event.type == sf::Event::Closed || 
-                (event.type == sf::Event::KeyPressed && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))) {
+        while (const std::optional event = window.pollEvent()) { // barebones event handling
+            if (event->is<sf::Event::Closed>() || 
+                event->is<sf::Event::KeyPressed>() && sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) 
+            {
                 std::cout << "avg FPS = " << fpsSum / static_cast<float>(numFrames) << "\n";
                 window.close();
             }
-            if (event.type == sf::Event::KeyPressed) {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || 
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
-                    if (event.key.code == sf::Keyboard::Equal) {
+            if (event->is<sf::Event::KeyPressed>()) 
+            {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) || 
+                    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) 
+                {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) 
+                    {
                         zoom -= zoomAmount * dt;
                         if (zoom < minZoom)
                             zoom = minZoom;
-                        cam.setSize(windowDim.x * zoom, windowDim.y * zoom);
-                        cam.move(centerToMouse.x, centerToMouse.y);
+                        
+                        cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                        cam.move({centerToMouse.x, centerToMouse.y});
                     }
-                    if (event.key.code == sf::Keyboard::Hyphen) {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
                         zoom += zoomAmount * dt;
                         if (zoom > maxZoom)
                             zoom = maxZoom;
-                        cam.setSize(windowDim.x * zoom, windowDim.y * zoom);
-                        cam.move(-centerToMouse.x, -centerToMouse.y);
+                        cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                        cam.move({-centerToMouse.x, -centerToMouse.y});
                     }
                 }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
                     if (world.contains(sfMouseWorldPos)) {
                         Vec2f newObjSize(getRandInRange(objSizeMin, objSizeMax), getRandInRange(objSizeMin, objSizeMax));
                         physics::Object newObj(
@@ -216,31 +227,31 @@ int main() {
                         
                     }
                 }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) { // reset view
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) { // reset view
                     zoom = defaultZoom;
-                    cam.setSize(windowDim.x, windowDim.y);
-                    cam.setCenter(windowDim.x / 2, windowDim.y / 2);
+                    cam.setSize({windowDim.x, windowDim.y});
+                    cam.setCenter({windowDim.x / 2, windowDim.y / 2});
                 }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::N)) {
                     showNodes = !showNodes;
                 }
             }
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            cam.move(-moveAmount * dt, 0);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || 
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+            cam.move({-moveAmount * dt, 0});
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            cam.move(0, -moveAmount * dt);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || 
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+            cam.move({0, -moveAmount * dt});
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            cam.move(moveAmount * dt, 0);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || 
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+            cam.move({moveAmount * dt, 0});
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            cam.move(0, moveAmount * dt);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || 
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+            cam.move({0, moveAmount * dt});
         }
         
         for (auto &obj : physObjs) {
@@ -280,7 +291,10 @@ int main() {
         // DRAW VERTICIES
         window.clear();
         window.setView(cam);
-        window.draw(&verticies[0], verticies.size(), sf::Quads);
+        // TODO: switch this to use sf::Triangles
+        // window.draw(&verticies[0], verticies.size(), sf::Quads);
+        window.draw(&verticies[0], verticies.size(), sf::PrimitiveType::Triangles);
+
         
         verticies.clear(); // clear vector
 
@@ -291,48 +305,48 @@ int main() {
         sprintf(c, "%.f", fps);
         winTextString = "FPS: " + std::string(c);
         winText.setString(winTextString);
-        winText.setPosition(5.f, 2.f);
+        winText.setPosition({5.f, 2.f});
         textCanvas.draw(winText);
 
         winTextString = "Obj Count: " + std::to_string(curNumObjects);
-        winText.setPosition(5.f, 32.f);
+        winText.setPosition({5.f, 32.f});
         winText.setString(winTextString);
         textCanvas.draw(winText);
 
         winTextString = "Collision Count: " + std::to_string(curNumCollisions);
-        winText.setPosition(5.f, 63.f);
+        winText.setPosition({5.f, 63.f});
         winText.setString(winTextString);
         textCanvas.draw(winText);
 
         if (useQuadtree) {
             winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]    show quadtree: [N]\nzoom: [ctrl +-]";
             winText.setString(winTextString);
-            winText.setPosition(300.f, 2.f);
+            winText.setPosition({300.f, 2.f});
             textCanvas.draw(winText);
 
             winTextString = "quadtree accelerated\ncollision detection";
             winText.setString(winTextString);
             winText.setFillColor(sf::Color(80, 230, 80));
-            winText.setPosition(static_cast<float>(windowDim.x) - 250.f, 2.f);
+            winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
             textCanvas.draw(winText);
         }
         else {
             winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]\nzoom: [ctrl +-]";
             winText.setString(winTextString);
-            winText.setPosition(300.f, 2.f);
+            winText.setPosition({300.f, 2.f});
             textCanvas.draw(winText);
 
             winTextString = "brute force\ncollision detection";
             winText.setString(winTextString);
             winText.setFillColor(sf::Color(240, 140, 80));
-            winText.setPosition(static_cast<float>(windowDim.x) - 250.f, 2.f);
+            winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
             textCanvas.draw(winText);
         }
 
         textCanvas.display();
         sf::Sprite uiSprite(textCanvas.getTexture());
-        uiSprite.setPosition(cam.getCenter().x - cam.getSize().x / 2, cam.getCenter().y - cam.getSize().y / 2);
-        uiSprite.setScale(zoom, zoom);
+        uiSprite.setPosition({cam.getCenter().x - cam.getSize().x / 2, cam.getCenter().y - cam.getSize().y / 2});
+        uiSprite.setScale({zoom, zoom});
         
         window.draw(uiSprite);
 

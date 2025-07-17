@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <algorithm>
 #include "Rect.hpp"
 #include "Vec2.hpp"
 
