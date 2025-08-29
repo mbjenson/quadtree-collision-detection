@@ -11,12 +11,7 @@
 #include "Physics.hpp"
 #include "Quadtree.hpp"
 
-// callable for quadtree
-struct GetRectPhys {
-    Rect<float>& operator()(physics::Object* obj) const {
-        return obj->boundingBox;
-    }
-};
+
 
 int main() {
     
@@ -27,6 +22,15 @@ int main() {
     float objInitVelMax = 60.f;
     bool showNodes = true;
     bool useQuadtree = true;
+
+    // color pallete
+    std::array<sf::Color, 12> colors = {
+        sf::Color(255, 90, 51), sf::Color(255, 128, 0), 
+        sf::Color(255, 255, 51), sf::Color(153, 255, 51), 
+        sf::Color(51, 255, 51), sf::Color(51, 255, 153), 
+        sf::Color(51, 255, 255), sf::Color(51, 153, 255),
+        sf::Color(51, 51, 255), sf::Color(153, 51, 255), 
+        sf::Color(255, 51, 255), sf::Color(255, 51, 153)};
 
     sf::Vector2u screenRes = sf::VideoMode::getDesktopMode().size;
     int leastScreenDim = (screenRes.x < screenRes.y) ? screenRes.x : screenRes.y;
@@ -55,7 +59,7 @@ int main() {
         std::cout << "Enter object count: ";
         std::cin >> sceneNumObjects;
     }
-
+    
     std::cout << "Enter object size range 'min max': ";
     std::cin >> objSizeMin >> objSizeMax;
     while (!std::cin) {
@@ -97,15 +101,6 @@ int main() {
         "Quadtree Demonstration", 
         sf::Style::Titlebar | sf::Style::Close};
 
-    // color pallete
-    std::array<sf::Color, 12> colors = {
-        sf::Color(255, 90, 51), sf::Color(255, 128, 0), 
-        sf::Color(255, 255, 51), sf::Color(153, 255, 51), 
-        sf::Color(51, 255, 51), sf::Color(51, 255, 153), 
-        sf::Color(51, 255, 255), sf::Color(51, 153, 255),
-        sf::Color(51, 51, 255), sf::Color(153, 51, 255), 
-        sf::Color(255, 51, 255), sf::Color(255, 51, 153)};
-    
     sf::View cam(
         sf::FloatRect(
             {0, 0}, 
@@ -116,10 +111,10 @@ int main() {
     const float maxZoom = 3.0f;
     const float minZoom = 0.05f;
     const float defaultZoom = 1.f;
-    const float zoomAmount = 0.05f;
+    const float zoomAmount = 3.f;
+
     float zoom = 1.f;
-    float moveAmount = 200.f;
-    
+    const float moveAmount = 200.f;
 
     sf::Clock clock;
     float dt;
@@ -181,7 +176,7 @@ int main() {
 
     std::cout << "running...\n";
     while (window.isOpen()) {
-        
+
         dt = clock.restart().asSeconds();
         float fps = 1.f/(dt);
         numFrames++;
@@ -196,8 +191,9 @@ int main() {
         float mag = centerToMouse.getMag();
         centerToMouse.normalize();
         centerToMouse = centerToMouse * mag * 0.25;
-
+    
         // handle events
+
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>() || 
                 event->is<sf::Event::KeyPressed>() && 
@@ -208,26 +204,26 @@ int main() {
             }
             if (event->is<sf::Event::KeyPressed>()) 
             {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) || 
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) 
-                {
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) 
-                    {
-                        zoom -= zoomAmount;
-                        if (zoom < minZoom)
-                            zoom = minZoom;
+                // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) || 
+                //     sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) 
+                // {
+                //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) 
+                //     {
+                //         zoom -= zoomAmount;
+                //         if (zoom < minZoom)
+                //             zoom = minZoom;
                         
-                        cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                        cam.move({centerToMouse.x, centerToMouse.y});
-                    }
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
-                        zoom += zoomAmount;
-                        if (zoom > maxZoom)
-                            zoom = maxZoom;
-                        cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                        cam.move({-centerToMouse.x, -centerToMouse.y});
-                    }
-                }
+                //         cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                //         cam.move({centerToMouse.x, centerToMouse.y});
+                //     }
+                //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
+                //         zoom += zoomAmount;
+                //         if (zoom > maxZoom)
+                //             zoom = maxZoom;
+                //         cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                //         cam.move({-centerToMouse.x, -centerToMouse.y});
+                //     }
+                // }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
                     if (world.contains(sfMouseWorldPos)) {
                         Vec2f newObjSize(
@@ -262,6 +258,24 @@ int main() {
                 }
             }
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) {
+                zoom -= zoomAmount * dt;
+                if (zoom < minZoom) {
+                    zoom = minZoom;
+                }
+                cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                cam.move({(centerToMouse.x / zoom) * dt, (centerToMouse.y / zoom) * dt});
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
+                zoom += zoomAmount * dt;
+                if (zoom > maxZoom) {
+                    zoom = maxZoom;
+                }
+                cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
+                cam.move({(-centerToMouse.x / zoom ) * dt, (-centerToMouse.y / zoom ) * dt});
+            }
+        }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
             cam.move({-moveAmount * dt, 0});
@@ -279,8 +293,11 @@ int main() {
             cam.move({0, moveAmount * dt});
         }
         
+
+        // update physics
+
         for (auto &obj : physObjs) {
-            obj.update(dt); // update physics objects
+            obj.update(dt);
         }
 
         // for (auto &obj : physObjs) {
@@ -300,7 +317,7 @@ int main() {
 
             if (showNodes) {
                 qt.getNodeRects(nodeRects);
-                computeBoxFrameVertsFromVec(nodeRects, vertices, sf::Color(255, 255, 255, 120), 0.8f);
+                computeBoxFrameVertsFromVec(nodeRects, vertices, sf::Color(255, 255, 255, 120), 1.0f);
                 nodeRects.clear();
             }
             qt.clearAll();
@@ -309,20 +326,16 @@ int main() {
             pHandler.BRUTE_resolveCols(physObjs);
         }
         computePhysicsObjectVerts(physObjs, vertices);
-        // computePhysicsObjectVertsFromVec(physObjs, verticies);
 
-        computeBoxFrameVerts(worldBounds.boundingBox, vertices, sf::Color::Yellow, 1.f);
+        computeBoxFrameVerts(worldBounds.boundingBox, vertices, sf::Color::Yellow, 2.f);
         objColMap.clear();
         
         // DRAW VERTICIES
         window.clear();
         window.setView(cam);
-        // TODO: switch this to use sf::Triangles
-        // window.draw(&verticies[0], verticies.size(), sf::Quads);
         window.draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
-
         
-        vertices.clear(); // clear vector
+        vertices.clear();
 
         // DRAW TEXT
         textCanvas.clear(sf::Color(255, 255, 255, 0));

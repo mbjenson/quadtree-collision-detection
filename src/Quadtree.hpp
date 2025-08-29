@@ -9,6 +9,13 @@
 #include "Vec2.hpp"
 #include "Rect.hpp"
 
+// callable for quadtree
+struct GetRectPhys {
+    Rect<float>& operator()(physics::Object* obj) const {
+        return obj->boundingBox;
+    }
+};
+
 /**
  * @brief quad tree data structure class.
  *          Computes bounding boxes on the fly to save space.
