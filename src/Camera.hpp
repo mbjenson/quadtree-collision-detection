@@ -39,6 +39,22 @@ class Camera : public sf::View {
             return currZoom;
         }
 
+        void moveRight(float dt) {
+            move({movementSpeed * dt, 0});
+        }
+
+        void moveLeft(float dt) {
+            move({-movementSpeed * dt, 0});
+        }
+
+        void moveUp(float dt) {
+            move({0, -movementSpeed * dt});
+        }
+
+        void moveDown(float dt) {
+            move({0, movementSpeed * dt});
+        }
+
     private:
         const float maxZoom = 3.0f;
         const float minZoom = 0.05f;

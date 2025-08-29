@@ -114,14 +114,6 @@ int main() {
             {static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)}
         ));
     window.setView(camera);
-    
-    const float maxZoom = 3.0f;
-    const float minZoom = 0.05f;
-    const float defaultZoom = 1.f;
-    const float zoomAmount = 3.f;
-
-    float zoom = 1.f;
-    const float moveAmount = 200.f;
 
     sf::Clock clock;
     float dt;
@@ -249,19 +241,19 @@ int main() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-            camera.move({-moveAmount * dt, 0});
+            camera.moveLeft(dt);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-            camera.move({0, -moveAmount * dt});
+            camera.moveUp(dt);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-            camera.move({moveAmount * dt, 0});
+            camera.moveRight(dt);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-            camera.move({0, moveAmount * dt});
+            camera.moveDown(dt);
         }
         
 
