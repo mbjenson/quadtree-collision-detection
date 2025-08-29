@@ -10,8 +10,15 @@
 #include "RandomUtil.hpp"
 #include "Physics.hpp"
 #include "Quadtree.hpp"
+#include "Camera.hpp"
 
 
+// callable for quadtree
+struct GetRectPhys {
+    Rect<float>& operator()(physics::Object* obj) const {
+        return obj->boundingBox;
+    }
+};
 
 int main() {
     
@@ -101,12 +108,12 @@ int main() {
         "Quadtree Demonstration", 
         sf::Style::Titlebar | sf::Style::Close};
 
-    sf::View cam(
+    Camera camera(
         sf::FloatRect(
             {0, 0}, 
             {static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)}
         ));
-    window.setView(cam);
+    window.setView(camera);
     
     const float maxZoom = 3.0f;
     const float minZoom = 0.05f;
@@ -187,7 +194,7 @@ int main() {
         sf::Vector2f sfMouseWorldPos = window.mapPixelToCoords(sfMousePos);
         
         // compute center of view to mouse vector
-        Vec2f centerToMouse(sfMouseWorldPos - cam.getCenter());
+        Vec2f centerToMouse(sfMouseWorldPos - camera.getCenter());
         float mag = centerToMouse.getMag();
         centerToMouse.normalize();
         centerToMouse = centerToMouse * mag * 0.25;
@@ -204,26 +211,6 @@ int main() {
             }
             if (event->is<sf::Event::KeyPressed>()) 
             {
-                // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) || 
-                //     sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl)) 
-                // {
-                //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) 
-                //     {
-                //         zoom -= zoomAmount;
-                //         if (zoom < minZoom)
-                //             zoom = minZoom;
-                        
-                //         cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                //         cam.move({centerToMouse.x, centerToMouse.y});
-                //     }
-                //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
-                //         zoom += zoomAmount;
-                //         if (zoom > maxZoom)
-                //             zoom = maxZoom;
-                //         cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                //         cam.move({-centerToMouse.x, -centerToMouse.y});
-                //     }
-                // }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
                     if (world.contains(sfMouseWorldPos)) {
                         Vec2f newObjSize(
@@ -245,13 +232,7 @@ int main() {
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) { // reset view
-                    zoom = defaultZoom;
-                    cam.setSize({
-                        static_cast<float>(windowDim.x), 
-                        static_cast<float>(windowDim.y)});
-                    cam.setCenter({
-                        static_cast<float>(windowDim.x) / 2.0f, 
-                        static_cast<float>(windowDim.y) / 2.0f});
+                    camera.resetZoom(windowDim);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::N)) {
                     showNodes = !showNodes;
@@ -260,37 +241,27 @@ int main() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) {
-                zoom -= zoomAmount * dt;
-                if (zoom < minZoom) {
-                    zoom = minZoom;
-                }
-                cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                cam.move({(centerToMouse.x / zoom) * dt, (centerToMouse.y / zoom) * dt});
+                camera.zoomIn(dt, windowDim, centerToMouse);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
-                zoom += zoomAmount * dt;
-                if (zoom > maxZoom) {
-                    zoom = maxZoom;
-                }
-                cam.setSize({windowDim.x * zoom, windowDim.y * zoom});
-                cam.move({(-centerToMouse.x / zoom ) * dt, (-centerToMouse.y / zoom ) * dt});
+                camera.zoomOut(dt, windowDim, centerToMouse);
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-            cam.move({-moveAmount * dt, 0});
+            camera.move({-moveAmount * dt, 0});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-            cam.move({0, -moveAmount * dt});
+            camera.move({0, -moveAmount * dt});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-            cam.move({moveAmount * dt, 0});
+            camera.move({moveAmount * dt, 0});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || 
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-            cam.move({0, moveAmount * dt});
+            camera.move({0, moveAmount * dt});
         }
         
 
@@ -332,7 +303,7 @@ int main() {
         
         // DRAW VERTICIES
         window.clear();
-        window.setView(cam);
+        window.setView(camera);
         window.draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
         
         vertices.clear();
@@ -387,10 +358,10 @@ int main() {
         sf::Sprite uiSprite(textCanvas.getTexture());
 
         uiSprite.setPosition({
-            cam.getCenter().x - cam.getSize().x / 2, 
-            cam.getCenter().y - cam.getSize().y / 2});
+            camera.getCenter().x - camera.getSize().x / 2, 
+            camera.getCenter().y - camera.getSize().y / 2});
 
-        uiSprite.setScale({zoom, zoom});
+        uiSprite.setScale({camera.getCurrZoom(), camera.getCurrZoom()});
         
         window.draw(uiSprite);
 
