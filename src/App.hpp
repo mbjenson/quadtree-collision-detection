@@ -124,6 +124,27 @@ class App {
                         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::N)) {
                             showNodes = !showNodes;
                         }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::G)) {
+                            if (world.contains(mouseWorldPos)) {
+                                Vec2f newObjSize(Vec2f(80.0f, 80.0f));
+
+                                physics::Object newObj(
+                                    Vec2f(
+                                        mouseWorldPos.x - (newObjSize.x / 2), 
+                                        mouseWorldPos.y - (newObjSize.y / 2)), 
+                                    newObjSize, newObjSize.x * newObjSize.y);
+                                
+                                newObj.velocity = Vec2f(
+                                    getRandVelocity(appSettings.objectVelMin / 2, appSettings.objectVelMax / 2), 
+                                    getRandVelocity(appSettings.objectVelMin / 2, appSettings.objectVelMax / 2));
+
+                                newObj.color = sf::Color::White;
+                                pObjs.push_back(newObj);
+                            }
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F)) {
+                            this->pObjs.clear();
+                        }
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
@@ -334,9 +355,9 @@ class App {
             textCanvas.draw(winText);
 
             if (appSettings.useQuadtree) {
-                winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]    show quadtree: [N]\nzoom: [ctrl +-]";
+                winTextString = "reset view: [R]     place objects: [space] & [G]\nmove: [WASD]    show quadtree: [N]\nzoom: [ctrl +-]     clear: [F]";
                 winText.setString(winTextString);
-                winText.setPosition({300.f, 2.f});
+                winText.setPosition({250.f, 2.f});
                 textCanvas.draw(winText);
 
                 winTextString = "quadtree: on";
@@ -347,9 +368,9 @@ class App {
                 textCanvas.draw(winText);
             }
             else {
-                winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]\nzoom: [ctrl +-]";
+                winTextString = "reset view: [R]     place objects: [space] & [G]\nmove: [WASD]\nzoom: [ctrl +-]     clear: [F]";
                 winText.setString(winTextString);
-                winText.setPosition({300.f, 2.f});
+                winText.setPosition({250.f, 2.f});
                 textCanvas.draw(winText);
 
                 winTextString = "quadtree: off";
