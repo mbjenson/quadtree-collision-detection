@@ -6,95 +6,49 @@
 #include <limits>
 #include <filesystem>
 #include <unordered_map>
-#include "VertUtil.hpp"
-#include "RandomUtil.hpp"
-#include "Physics.hpp"
-#include "Quadtree.hpp"
-#include "Camera.hpp"
+#include "App.hpp"
 
+app::AppSettings getAppSettings() {
+    app::AppSettings appSettings;
 
-// callable for quadtree
-struct GetRectPhys {
-    Rect<float>& operator()(physics::Object* obj) const {
-        return obj->boundingBox;
-    }
-};
-
-int main() {
-    
-    int sceneNumObjects = 10;
-    float objSizeMin = 10.f;
-    float objSizeMax = 50.f;
-    float objInitVelMin = 20.f;
-    float objInitVelMax = 60.f;
-    bool showNodes = true;
-    bool useQuadtree = true;
-
-    // color pallete
-    std::array<sf::Color, 12> colors = {
-        sf::Color(255, 90, 51), sf::Color(255, 128, 0), 
-        sf::Color(255, 255, 51), sf::Color(153, 255, 51), 
-        sf::Color(51, 255, 51), sf::Color(51, 255, 153), 
-        sf::Color(51, 255, 255), sf::Color(51, 153, 255),
-        sf::Color(51, 51, 255), sf::Color(153, 51, 255), 
-        sf::Color(255, 51, 255), sf::Color(255, 51, 153)};
-
-    sf::Vector2u screenRes = sf::VideoMode::getDesktopMode().size;
-    int leastScreenDim = (screenRes.x < screenRes.y) ? screenRes.x : screenRes.y;
-
-    const sf::Vector2u windowDim(leastScreenDim * 0.925, leastScreenDim);
-    int leastWinDim = (windowDim.x < windowDim.y) ? windowDim.x : windowDim.y;
-
-    Rect<int> worldDimI(
-        static_cast<int>(windowDim.x * 0.04545), 
-        static_cast<int>(windowDim.y * 0.125),
-        static_cast<int>(leastWinDim - leastWinDim * 0.0909), 
-        static_cast<int>(leastWinDim - leastWinDim * 0.0909));
-    
-    Rect<float> world(  
-        static_cast<float>(worldDimI.left), 
-        static_cast<float>(worldDimI.top),
-        static_cast<float>(worldDimI.width), 
-        static_cast<float>(worldDimI.height));
-   
     std::cout << "Enter object count: ";
-    std::cin >> sceneNumObjects;
+    std::cin >> appSettings.sceneNumObjects;
     while(!std::cin) {
         std::cout << "invalid input, please enter a number\n";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Enter object count: ";
-        std::cin >> sceneNumObjects;
+        std::cin >> appSettings.sceneNumObjects;
     }
     
     std::cout << "Enter object size range 'min max': ";
-    std::cin >> objSizeMin >> objSizeMax;
+    std::cin >> appSettings.objectSizeMin >> appSettings.objectSizeMax;
     while (!std::cin) {
         std::cout << "Invalid input, please enter two nums 'min max'\n";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Enter object size range 'min max': ";
-        std::cin >> objSizeMin >> objSizeMax;
+        std::cin >> appSettings.objectSizeMin >> appSettings.objectSizeMax;
     }
 
     std::cout << "Enter object velocity range 'min max': ";
-    std::cin >> objInitVelMin >> objInitVelMax;
+    std::cin >> appSettings.objectVelMin >> appSettings.objectVelMax;
     while (!std::cin) {
         std::cout << "Invalid input, please enter two nums 'min max'\n";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Enter object velocity range 'min max': ";
-        std::cin >> objInitVelMin >> objInitVelMax;
+        std::cin >> appSettings.objectVelMin >> appSettings.objectVelMax;
     }
 
     std::cout << "Collision Detection: Quadtree Accelerated (1), Bruteforce (0): ";
-    std::cin >> useQuadtree;
+    std::cin >> appSettings.useQuadtree;
     while (!std::cin) {
         std::cout << "Invalid input, enter '1' or '0'\n";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Collision Deterction: Quadtree accelerated (1), Bruteforce (0): ";
-        std::cin >> useQuadtree;
+        std::cin >> appSettings.useQuadtree;
     }
 
     std::cout << "Press ENTER to start";
@@ -102,261 +56,12 @@ int main() {
     if (std::cin.get() == '\n') {
         std::cout << "Generating Scene...\n";
     }
-    
-    auto window = sf::RenderWindow{
-        sf::VideoMode(windowDim), 
-        "Quadtree Demonstration", 
-        sf::Style::Titlebar | sf::Style::Close};
 
-    Camera camera(
-        sf::FloatRect(
-            {0, 0}, 
-            {static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)}
-        ));
-    window.setView(camera);
+    return appSettings;
+}
 
-    sf::Clock clock;
-    float dt;
-
-    Rect<float> quadTreeDim(0, static_cast<int>(leastWinDim * 0.0909), leastWinDim, leastWinDim);
-    Quadtree<physics::Object*, GetRectPhys> qt(quadTreeDim);
-    
-    physics::Boundary worldBounds(world);
-    physics::PhysicsHandler pHandler;
-    std::vector<physics::Object> physObjs;
-    
-    // create physics objects
-    physObjs.reserve(sceneNumObjects);
-    for (int i = 0; i < sceneNumObjects; i++) {
-        physics::Object thisObj(
-            Vec2f(  
-                rand() % (worldDimI.width - 300) + worldDimI.left,
-                rand() % (worldDimI.height - 300) + worldDimI.top),
-            Vec2f(getRandInRange(objSizeMin, objSizeMax), 
-            getRandInRange(objSizeMin, objSizeMax)));
-        
-        thisObj.color = colors[rand() % colors.size()];
-        thisObj.velocity = Vec2f(
-            getRandVelocity(objInitVelMin, objInitVelMax), 
-            getRandVelocity(objInitVelMin, objInitVelMax));
-        thisObj.mass = thisObj.boundingBox.width * thisObj.boundingBox.height;
-        physObjs.emplace_back(thisObj);
-    }
-    
-    std::vector<Rect<float>> nodeRects;
-    std::unordered_map<physics::Object*, physics::Object*> objColMap;
-    std::vector<sf::Vertex> vertices;
-
-    sf::RenderTexture textCanvas;
-    try {
-        textCanvas = sf::RenderTexture({windowDim.x, windowDim.y / 9});
-    }
-    catch (sf::Exception ex) {
-        printf(ex.what());
-        return EXIT_FAILURE;
-    }
-    
-    sf::Font roboto;
-    if (!roboto.openFromFile("res/Roboto/Roboto-Regular.ttf")) {
-        return EXIT_FAILURE;
-    }
-    
-    std::string winTextString;
-    sf::Text winText(roboto);
-    winText.setCharacterSize(25);
-    winText.setFillColor(sf::Color::White);
-    winText.setPosition({0, 0});
-
-    int curNumNodes = 1;
-    int curNumCollisions = 0;
-    int curNumObjects = 0;
-    int numFrames = 0;
-    float fpsSum = 0;
-
-    std::cout << "running...\n";
-    while (window.isOpen()) {
-
-        dt = clock.restart().asSeconds();
-        float fps = 1.f/(dt);
-        numFrames++;
-        fpsSum += fps;
-
-        // mouse position
-        sf::Vector2i sfMousePos = sf::Mouse::getPosition(window);
-        sf::Vector2f sfMouseWorldPos = window.mapPixelToCoords(sfMousePos);
-        
-        // compute center of view to mouse vector
-        Vec2f centerToMouse(sfMouseWorldPos - camera.getCenter());
-        float mag = centerToMouse.getMag();
-        centerToMouse.normalize();
-        centerToMouse = centerToMouse * mag * 0.25;
-    
-        // handle events
-
-        while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>() || 
-                event->is<sf::Event::KeyPressed>() && 
-                sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) 
-            {
-                std::cout << "avg FPS = " << fpsSum / static_cast<float>(numFrames) << "\n";
-                window.close();
-            }
-            if (event->is<sf::Event::KeyPressed>()) 
-            {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-                    if (world.contains(sfMouseWorldPos)) {
-                        Vec2f newObjSize(
-                            getRandInRange(objSizeMin, objSizeMax), 
-                            getRandInRange(objSizeMin, objSizeMax));
-
-                        physics::Object newObj(
-                            Vec2f(
-                                sfMouseWorldPos.x - (newObjSize.x / 2), 
-                                sfMouseWorldPos.y - (newObjSize.y / 2)), 
-                            newObjSize, newObjSize.x * newObjSize.y);
-                        
-                        newObj.velocity = Vec2f(
-                            getRandVelocity(objInitVelMin, objInitVelMax), 
-                            getRandVelocity(objInitVelMin, objInitVelMax));
-
-                        newObj.color = colors[rand() % colors.size()];
-                        physObjs.push_back(newObj);
-                    }
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) { // reset view
-                    camera.resetZoom(windowDim);
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::N)) {
-                    showNodes = !showNodes;
-                }
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Equal)) {
-                camera.zoomIn(dt, windowDim, centerToMouse);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Hyphen)) {
-                camera.zoomOut(dt, windowDim, centerToMouse);
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-            camera.moveLeft(dt);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-            camera.moveUp(dt);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-            camera.moveRight(dt);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) || 
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-            camera.moveDown(dt);
-        }
-        
-
-        // update physics
-
-        for (auto &obj : physObjs) {
-            obj.update(dt);
-        }
-
-        // for (auto &obj : physObjs) {
-        //     worldBounds.checkCollision(obj); // resolve collisions with world boundary
-        // }
-        
-        if (useQuadtree) {
-            for (int i = 0; i < physObjs.size(); i++) {
-                worldBounds.checkCollision(physObjs[i]);
-                qt.add(&physObjs[i]);
-            }
-            objColMap = qt.findAllIntersections();
-            curNumCollisions = objColMap.size();
-            curNumObjects = qt.getNumObjects();
-
-            pHandler.resolveColsFromMap(objColMap);
-
-            if (showNodes) {
-                qt.getNodeRects(nodeRects);
-                computeBoxFrameVertsFromVec(nodeRects, vertices, sf::Color(255, 255, 255, 120), 1.0f);
-                nodeRects.clear();
-            }
-            qt.clearAll();
-        }
-        else {
-            pHandler.BRUTE_resolveCols(physObjs);
-        }
-        computePhysicsObjectVerts(physObjs, vertices);
-
-        computeBoxFrameVerts(worldBounds.boundingBox, vertices, sf::Color::Yellow, 2.f);
-        objColMap.clear();
-        
-        // DRAW VERTICIES
-        window.clear();
-        window.setView(camera);
-        window.draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
-        
-        vertices.clear();
-
-        // DRAW TEXT
-        textCanvas.clear(sf::Color(255, 255, 255, 0));
-        winText.setFillColor(sf::Color(255, 255, 255));
-        char c[10];
-        sprintf(c, "%.f", fps);
-        winTextString = "FPS: " + std::string(c);
-        winText.setString(winTextString);
-        winText.setPosition({5.f, 2.f});
-        textCanvas.draw(winText);
-
-        winTextString = "Obj Count: " + std::to_string(curNumObjects);
-        winText.setPosition({5.f, 32.f});
-        winText.setString(winTextString);
-        textCanvas.draw(winText);
-
-        winTextString = "Collision Count: " + std::to_string(curNumCollisions);
-        winText.setPosition({5.f, 63.f});
-        winText.setString(winTextString);
-        textCanvas.draw(winText);
-
-        if (useQuadtree) {
-            winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]    show quadtree: [N]\nzoom: [ctrl +-]";
-            winText.setString(winTextString);
-            winText.setPosition({300.f, 2.f});
-            textCanvas.draw(winText);
-
-            winTextString = "quadtree accelerated\ncollision detection";
-            winText.setString(winTextString);
-            winText.setFillColor(sf::Color(80, 230, 80));
-            winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
-            textCanvas.draw(winText);
-        }
-        else {
-            winTextString = "reset view: [R]     place objects: [space]\nmove: [WASD]\nzoom: [ctrl +-]";
-            winText.setString(winTextString);
-            winText.setPosition({300.f, 2.f});
-            textCanvas.draw(winText);
-
-            winTextString = "brute force\ncollision detection";
-            winText.setString(winTextString);
-            winText.setFillColor(sf::Color(240, 140, 80));
-            winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
-            textCanvas.draw(winText);
-        }
-
-        textCanvas.display();
-        
-        sf::Sprite uiSprite(textCanvas.getTexture());
-
-        uiSprite.setPosition({
-            camera.getCenter().x - camera.getSize().x / 2, 
-            camera.getCenter().y - camera.getSize().y / 2});
-
-        uiSprite.setScale({camera.getCurrZoom(), camera.getCurrZoom()});
-        
-        window.draw(uiSprite);
-
-        window.display();
-    }
+int main() {
+    app::AppSettings appSettings = getAppSettings();
+    app::App app = app::App(appSettings);
+    app.Run();
 }

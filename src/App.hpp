@@ -57,7 +57,6 @@ class App {
             int numFrames = 0;
             float fpsSum = 0;
             float fps;
-
             float dt;
 
             bool showNodes = appSettings.showNodes;
@@ -65,7 +64,6 @@ class App {
 
             sf::Vector2f mouseWorldPos;
             Vec2f centerToMouse;
-
 
             while (window.isOpen()) {
 
@@ -158,10 +156,6 @@ class App {
                 for (auto &obj : pObjs) {
                     obj.update(dt);
                 }
-
-                // for (auto &obj : physObjs) {
-                //     worldBounds.checkCollision(obj); // resolve collisions with world boundary
-                // }
                 
                 if (useQuadTree) {
                     for (int i = 0; i < pObjs.size(); i++) {
@@ -189,11 +183,10 @@ class App {
                 computeBoxFrameVerts(worldBounds.boundingBox, vertices, sf::Color::Yellow, 2.f);
                 objColMap.clear();
                 
-                // DRAW VERTICIES
+                // DRAW TO SCREEN
                 window.clear();
                 window.setView(camera);
                 window.draw(&vertices[0], vertices.size(), sf::PrimitiveType::Triangles);
-                
                 vertices.clear();
 
                 drawUI(window, winText, fps, curNumObjects, curNumCollisions);
@@ -226,13 +219,16 @@ class App {
         std::vector<physics::Object> pObjs;
         Rect<float> world;
         sf::Vector2u windowDim;
-
+        
         Quadtree<physics::Object*, GetRectPhys> quadTree;
 
         bool init(AppSettings& appSettings) {
             
+            // Init window
+
             screenRes = sf::VideoMode::getDesktopMode().size;
             int leastScreenDim = (screenRes.x < screenRes.y) ? screenRes.x : screenRes.y;
+            leastScreenDim = leastScreenDim - (leastScreenDim / 10);
             windowDim = sf::Vector2u(leastScreenDim * 0.925, leastScreenDim);
             int leastWinDim = (windowDim.x < windowDim.y) ? windowDim.x : windowDim.y;
 
@@ -247,8 +243,6 @@ class App {
                 static_cast<float>(worldDimI.top),
                 static_cast<float>(worldDimI.width), 
                 static_cast<float>(worldDimI.height));
-            
-            worldBounds = physics::Boundary(world);
 
             window = sf::RenderWindow{
                 sf::VideoMode(windowDim), 
@@ -261,8 +255,12 @@ class App {
                     {static_cast<float>(windowDim.x), static_cast<float>(windowDim.y)}
                 )
             );
-            
+            camera.resetZoom(windowDim);
             window.setView(camera);
+
+            // Init physics
+
+            worldBounds = physics::Boundary(world);
 
             quadTree = Quadtree<physics::Object*, GetRectPhys>(
                 Rect<float>(
@@ -289,6 +287,8 @@ class App {
                 thisObj.mass = thisObj.boundingBox.width * thisObj.boundingBox.height;
                 pObjs.emplace_back(thisObj);
             }
+
+            // load assets
 
             try {
                 textCanvas = sf::RenderTexture({windowDim.x, windowDim.y / 9});
@@ -339,10 +339,11 @@ class App {
                 winText.setPosition({300.f, 2.f});
                 textCanvas.draw(winText);
 
-                winTextString = "quadtree accelerated\ncollision detection";
+                winTextString = "quadtree: on";
+                // winTextString = "quadtree accelerated\ncollision detection";
                 winText.setString(winTextString);
                 winText.setFillColor(sf::Color(80, 230, 80));
-                winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
+                winText.setPosition({static_cast<float>(windowDim.x) - 150.f, 2.f});
                 textCanvas.draw(winText);
             }
             else {
@@ -351,10 +352,11 @@ class App {
                 winText.setPosition({300.f, 2.f});
                 textCanvas.draw(winText);
 
-                winTextString = "brute force\ncollision detection";
+                winTextString = "quadtree: off";
+                // winTextString = "brute force\ncollision detection";
                 winText.setString(winTextString);
                 winText.setFillColor(sf::Color(240, 140, 80));
-                winText.setPosition({static_cast<float>(windowDim.x) - 250.f, 2.f});
+                winText.setPosition({static_cast<float>(windowDim.x) - 150.f, 2.f});
                 textCanvas.draw(winText);
             }
 
