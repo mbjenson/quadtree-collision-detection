@@ -24,11 +24,10 @@ https://github.com/mbjenson/quadtree-collision-detection/assets/115751313/adc229
 
 Dependencies
 * `g++`
-* `SFML`:
-    install with apt-get
+* `SFML 3.0`:
 
       sudo apt-get install libsfml-dev
-    or download from the [SFML website](https://www.sfml-dev.org/download.php)
+    or download from the [SFML website](https://www.sfml-dev.org/download.php) to get the correct version
 
 Clone this repository (or download the .zip)
 
