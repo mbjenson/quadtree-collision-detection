@@ -5,6 +5,10 @@ class Camera : public sf::View {
     public:
         Camera(sf::FloatRect dim) : sf::View(dim) {}
 
+        Camera() : sf::View() {}
+
+        void operator=(const Camera& camera) {}
+
         void zoomIn(float dt, sf::Vector2u windowDim, Vec2f centerToMouse) {
             currZoom -= zoomSpeed * dt;
             if (currZoom < minZoom) {
