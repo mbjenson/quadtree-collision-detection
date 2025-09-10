@@ -1,16 +1,18 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <algorithm>
 #include "Rect.hpp"
 #include "Vec2.hpp"
 
-
 /**
- * Rudementary physics system
+ * Physics system
 */
 namespace physics {
 
+/// @brief Simple rectangular physics object
 class Object {
+
 public:
 
     float mass;
@@ -27,11 +29,13 @@ public:
 
     void update(float dt) {
         position = position + velocity * dt;
-        boundingBox = Rect<float>(position.x, position.y, boundingBox.getSize().x, boundingBox.getSize().y);
+        boundingBox = Rect<float>(
+            position.x, position.y, boundingBox.getSize().x, boundingBox.getSize().y);
     }
 
     void updateBoundingBox() {
-        boundingBox = Rect<float>(position.x, position.y, boundingBox.getSize().x, boundingBox.getSize().y);
+        boundingBox = Rect<float>(
+            position.x, position.y, boundingBox.getSize().x, boundingBox.getSize().y);
     }
 
     void move(Vec2f distance) {
@@ -39,17 +43,21 @@ public:
     }
 };
 
-// objects can exist inside of the boundary
+/// @brief rectangle physics boundary
 class Boundary {
+
 public:
+
     Rect<float> boundingBox;
 
     Boundary(Rect<float> _boundingBox = Rect<float>()) : boundingBox(_boundingBox) {}
     
+    /// @brief check collision between this bounding box and another physics object
+    /// @param obj physics object to check against
     void checkCollision(Object& obj) {
-        // if object is not inside boundary
+        
         if (!boundingBox.contains(obj.boundingBox)) {
-            // check which part is not inside
+            
             if (obj.boundingBox.left < boundingBox.left) {
                 obj.position.x += (boundingBox.left - obj.boundingBox.left);
                 obj.velocity.x = -obj.velocity.x;
@@ -70,15 +78,16 @@ public:
     }
 };
 
-// class for handling groups of physics objects
-// contains functionality to deal with collisions within those groups
+/// @brief handles physics for a scene of objects
 class PhysicsHandler {
+    
 public:
 
     PhysicsHandler() {}
 
     // basic AABB collision resolution
-    /// @brief resolve single collision between two physics Objects using AABB collision detection and simple resolution
+    /// @brief resolve single collision between 
+    ///        two physics Objects using AABB collision detection and simple resolution
     /// @param first physics object reference
     /// @param second physics object reference
     void resolveCol(physics::Object& first, physics::Object& second) {
@@ -324,20 +333,30 @@ public:
         }
     }
     
-    void resolveColsFromVec(std::vector<std::pair<physics::Object*, physics::Object*>>& collisionList) {
+    /// @brief resolves collisions from a vec of physics objects
+    /// @param collisionList vec of physics objects
+    void resolveColsFromVec(
+        std::vector<std::pair<physics::Object*, 
+        physics::Object*>>& collisionList) 
+    {
         for (std::pair<physics::Object*, physics::Object*> pair : collisionList) {
             resolveCol(*pair.first, *pair.second);
         }
     }
 
-    // solves collisions from a map of of physics object key-value pairs
-    void resolveColsFromMap(std::unordered_map<physics::Object*, physics::Object*>& collisionList) {
+    /// @brief solves collisions from a map of of physics object key-value pairs
+    /// @param collisionList map of objects
+    void resolveColsFromMap(
+        std::unordered_map<physics::Object*, 
+        physics::Object*>& collisionList) 
+    {
         for (std::pair<physics::Object*, physics::Object*> pair : collisionList) {
             resolveCol(*pair.first, *pair.second);
         }
     }
     
-    // brute force given a list of physics objects
+    /// @brief brute force given a list of physics objects
+    /// @param objects vec of objects to resolve to collisions in
     void BRUTE_resolveCols(std::vector<physics::Object>& objects) {
         for (int i = 0; i < objects.size(); ++i) {
             for (int j = 0; j < objects.size(); ++j) {

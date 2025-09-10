@@ -13,7 +13,7 @@ public:
     T y;
 
     constexpr Vec2(T X = 0, T Y = 0) noexcept : x(X), y(Y) {}
-    // SFML DEPENDANT
+
     constexpr Vec2(sf::Vector2<T> sfVec) noexcept : x(sfVec.x), y(sfVec.y) {}
 
     const T getMag() {
@@ -85,7 +85,6 @@ public:
         y -= v.y;
     }
 
-    // SFML DEPENDANT
     const Vec2 operator =(const sf::Vector2<T>& v) {
         return Vec2<T>(v.x, v.y);
     }

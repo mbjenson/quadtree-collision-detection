@@ -9,7 +9,6 @@
 #include "Vec2.hpp"
 #include "Rect.hpp"
 
-
 /**
  * @brief quad tree data structure class.
  *          Computes bounding boxes on the fly to save space.
@@ -43,6 +42,8 @@ public:
         mGetRect(getRect),
         mEqual(equal)
     {}
+
+    Quadtree() {}
    
     // Public versions which call the private, auxillary methods
 
@@ -185,7 +186,9 @@ private:
             auto i = getQuadrant(rect, mGetRect(value));
             // add the value in a child if the value is entirely contained in it
             if (i != -1) {
-                add(node->children[static_cast<std::size_t>(i)].get(), depth + 1, computeRect(rect, i), value);
+                add(
+                    node->children[static_cast<std::size_t>(i)].get(), 
+                    depth + 1, computeRect(rect, i), value);
             }
             else {
                 node->values.push_back(value);
@@ -236,7 +239,9 @@ private:
             // remove value in a child if the value is entirely contained within it
             auto i = getQuadrant(rect, mGetRect(value));
             if (i != -1) {
-                if (remove(node->children[static_cast<std::size_t>(i)].get(), computeRect(rect, i), value)) {  // old
+                if (remove(
+                    node->children[static_cast<std::size_t>(i)].get(), 
+                    computeRect(rect, i), value)) {  // old
                     return tryMerge(node);
                 }
             }
@@ -335,7 +340,12 @@ private:
      * @param queryRect : novel rect for which new collisions are to be evaluated
      * @param values    : vector that will hold any found value-queryRect intersections
     */
-    void query(Node* node, const Rect<float>& rect, const Rect<float>& queryRect, std::vector<T>& values) const {
+    void query(
+        Node* node, 
+        const Rect<float>& rect, 
+        const Rect<float>& queryRect, 
+        std::vector<T>& values) const 
+    {
         assert(node != nullptr);
         assert(queryRect.intersects(rect));
         for (const auto& value : node->values) {
@@ -409,7 +419,11 @@ private:
      * @param value         : collisions are checked against this value
      * @param intersections : map of value-value intersections
     */
-    void findIntersectionsInDescendants(Node* node, const T& value, std::unordered_map<T, T>& intersections) const {
+    void findIntersectionsInDescendants(
+        Node* node, 
+        const T& value, 
+        std::unordered_map<T, T>& intersections) const 
+    {
         for (const auto& other : node->values) {
             if (mGetRect(value).intersects(mGetRect(other))) {
                 intersections.insert(std::make_pair(value, other));
