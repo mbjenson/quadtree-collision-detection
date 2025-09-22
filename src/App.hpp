@@ -92,8 +92,6 @@ class App {
                         sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) 
                     {
                         std::cout << "avg FPS = " << fpsSum / static_cast<float>(numFrames) << "\n";
-                        std::cout << "window dim: " << windowDim.x << ", " << windowDim.y << std::endl;
-                        std::cout << "res" << screenRes.x << ", " << screenRes.y << std::endl;
                         window.close();
                     }
                     if (event->is<sf::Event::KeyPressed>()) 
