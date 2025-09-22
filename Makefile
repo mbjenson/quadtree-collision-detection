@@ -1,9 +1,19 @@
+BUILD_DIR := build
+CONFIG ?= Release
 
-all:
-	g++ -std=c++17 -O3 -o app ./src/*.cpp -lsfml-graphics -lsfml-window -lsfml-system
+.PHONY: all configure build clean
+
+all: build
+
+configure:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR) && cmake -S ../ -B . -DCMAKE_BUILD_TYPE=$(CONFIG)
+
+build: configure
+	cd $(BUILD_DIR) && cmake --build . --config $(CONFIG)
 
 run:
-	./app
+	./$(BUILD_DIR)/bin/PhysicsSim
 
 clean:
-	rm app
+	rm -rf $(BUILD_DIR)
