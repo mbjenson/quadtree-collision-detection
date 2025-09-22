@@ -47,7 +47,7 @@ class App {
 
             std::string winTextString;
             sf::Text winText = sf::Text(roboto);
-            winText.setCharacterSize(25);
+            winText.setCharacterSize(20);
             winText.setFillColor(sf::Color::White);
             winText.setPosition({0, 0});
 
@@ -337,19 +337,11 @@ class App {
             winText.setFillColor(sf::Color(255, 255, 255));
             char c[10];
             sprintf(c, "%.f", fps);
-            winTextString = "FPS: " + std::string(c);
+            winTextString = "FPS: " + std::string(c) + 
+                            "\nObj Count: " + std::to_string(currNumObjects) +
+                            "\nCollision Count: " + std::to_string(currNumCollisions);
             winText.setString(winTextString);
             winText.setPosition({5.f, 2.f});
-            textCanvas.draw(winText);
-
-            winTextString = "Obj Count: " + std::to_string(currNumObjects);
-            winText.setPosition({5.f, 32.f});
-            winText.setString(winTextString);
-            textCanvas.draw(winText);
-
-            winTextString = "Collision Count: " + std::to_string(currNumCollisions);
-            winText.setPosition({5.f, 63.f});
-            winText.setString(winTextString);
             textCanvas.draw(winText);
 
             if (appSettings.useQuadtree) {
