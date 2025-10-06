@@ -7,7 +7,6 @@ Visualization of how a quadtree can be used to massively increase the performanc
 * [**Scene Settup**](#scene-settup)
 * [**Logic**](#logic)
 * [**Rendering**](#rendering)
-* [**User-Interface and Controls**](#user-interface-and-controls)
 
 
 ## Preview
